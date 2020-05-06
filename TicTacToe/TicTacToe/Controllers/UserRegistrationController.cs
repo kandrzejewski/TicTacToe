@@ -27,9 +27,25 @@ namespace TicTacToe.Controllers
             if (ModelState.IsValid)
             {
                 await _userService.RegisterUser(userModel);
-                return Content($"Użytkownik {userModel.FirstName} {userModel.LastName} został pomyślnie zarejestrowany.");
+                //return Content($"Użytkownik {userModel.FirstName} {userModel.LastName} został pomyślnie zarejestrowany.");
+                return RedirectToAction(nameof(EmailConfirmation), new { userModel.Email });
             }
             return View(userModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EmailConfirmation (string email)
+        {
+            var user = await _userService.GetUserByEmail(email);
+            if(user?.IsEmailConfirmed == true)
+            {
+                return RedirectToAction("Index", "GameInvitation", new
+                {
+                    email
+                });
+            }
+            ViewBag.Email = email;
+            return View();
         }
     }
 }

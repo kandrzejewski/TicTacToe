@@ -1,0 +1,30 @@
+﻿@model TicTacToe.Models.GameInvitationModel
+
+@{
+    ViewData["Title"] = "Indeks";
+}
+
+<h4>Zaproś nowego gracza</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Index">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="InvitedBy" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="EmailTo" class="control-label"> Adresat e-maila:</label>
+                <input asp-for="EmailTo" class="form-control" />
+                <span asp-validation-for="EmailTo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Utwórz" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Home" asp-action="Index">Wróć do strony głównej</a>
+</div>
+

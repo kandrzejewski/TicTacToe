@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TicTacToe.Services;
+using TicTacToe.Extensions;
 
 namespace TicTacToe
 {
@@ -41,6 +42,8 @@ namespace TicTacToe
             //app.UseDirectoryBrowser();
  
             app.UseRouting();
+
+            app.UseCommunicationMiddleware();
 
             app.UseEndpoints(endpoints =>
             {
