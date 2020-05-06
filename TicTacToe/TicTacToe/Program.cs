@@ -21,6 +21,8 @@ namespace TicTacToe
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.CaptureStartupErrors(true)
+                    .PreferHostingUrls(true)
+                    .UseUrls("http://localhost:5000")
                         .UseStartup<Startup>();
                 });
     }

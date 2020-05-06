@@ -1,6 +1,6 @@
 ﻿var interval;
 function EmailConfirmation(email) {
-    interval = setInterval(() => {
+    interval = setInterval(function() {
         CheckEmailConfirmationStatus(email);
     }, 1000);
 }
