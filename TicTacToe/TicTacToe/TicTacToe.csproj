@@ -5,7 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Remove="Localization\Controllers\GameInvitationController.pl.resx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\css\site.min.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Localization\Controllers\GameInvitationController.pl.resx" />
   </ItemGroup>
 
   <ItemGroup>

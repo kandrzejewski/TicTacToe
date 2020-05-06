@@ -1,11 +1,12 @@
 ﻿@model TicTacToe.Models.UserModel
 
 @{
-    ViewData["Title"] = "Zarejestruj się";
+    ViewData["Title"] = Localizer["Title"];
 }
 
 
-<h2>Rejestracja nowego użytkownika</h2>
+<h2>@ViewData["Title"]</h2>
+<h4>@Localizer["SubTitle"]</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">

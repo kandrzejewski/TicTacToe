@@ -28,12 +28,14 @@ namespace TicTacToe.Middlewares
                 var webSocket = await context.WebSockets.AcceptWebSocketAsync();
                 var ct = context.RequestAborted;
                 var json = await ReceiveStringAsync(webSocket, ct);
+                Console.WriteLine(json);
                 var command = JsonConvert.DeserializeObject<dynamic>(json);
                 switch (command.Operation.ToString())
                 {
                     case "CheckEmailConfirmationStatus":
                         {
-                            await ProcessEmailConfirmation(context, webSocket, ct, command.Parameters.ToString());
+                            await ProcessEmailConfirmation(context, webSocket, 
+                                ct, command.Parameters.ToString());
                             break;
                         }
                 }
