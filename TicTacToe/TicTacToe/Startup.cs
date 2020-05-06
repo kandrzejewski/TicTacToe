@@ -29,7 +29,6 @@ namespace TicTacToe
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                //app.UseDirectoryBrowser();
             }
             else
             {
@@ -42,6 +41,8 @@ namespace TicTacToe
             //app.UseDirectoryBrowser();
  
             app.UseRouting();
+
+            app.UseWebSockets();
 
             app.UseCommunicationMiddleware();
 
