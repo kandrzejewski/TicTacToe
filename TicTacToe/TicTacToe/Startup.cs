@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using TicTacToe.Services;
 using TicTacToe.Extensions;
+using Microsoft.Extensions.Configuration;
 
 namespace TicTacToe
 {
@@ -19,11 +20,21 @@ namespace TicTacToe
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+
+        public IConfiguration _configuration { get; }
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {         
             services.AddDirectoryBrowser();
             services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
             services.AddSingleton<IUserService, UserService>();
+            services.Configure<Options.EmailServiceOptions>(_configuration.GetSection("Email"));
+            services.AddSingleton<IEmailService, EmailService>();
             services.AddLocalization(options => options.ResourcesPath = "Localization");
             services.AddMvc().AddViewLocalization(
                 LanguageViewLocationExpanderFormat.Suffix,
