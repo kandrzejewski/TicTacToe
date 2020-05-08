@@ -11,3 +11,16 @@ function EmailConfirmation(email) {
         }, 1000);
     }
 }
+
+function GameInvitationConfirmation(id) {
+    if (window.WebSocket) {
+        alert("Gniazda WebSockets są aktywne");
+        openSocket(id, "GameInvitation");
+    }
+    else {
+        alert("Gniazda WebSockets nie są aktywne");
+        interval = setInterval(function () {
+            CheckGameInvitationConfirmationStatus(id);
+        }, 2000);
+    }
+}
