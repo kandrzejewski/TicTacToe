@@ -22,26 +22,58 @@ namespace TicTacToe
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 
         public IConfiguration _configuration { get; }
+        public IHostEnvironment _hostingEnvironment { get; }
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
         {
             _configuration = configuration;
+            _hostingEnvironment = hostEnvironment;
         }
 
-        public void ConfigureServices(IServiceCollection services)
-        {         
-            services.AddDirectoryBrowser();
-            services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
-            services.AddSingleton<IUserService, UserService>();
-            services.Configure<Options.EmailServiceOptions>(_configuration.GetSection("Email"));
-            services.AddSingleton<IEmailService, EmailService>();
-            services.AddSingleton<IGameInvitationService, GameInvitationService>();
+        public void ConfigureCommonServices(IServiceCollection services)
+        {
             services.AddLocalization(options => options.ResourcesPath = "Localization");
             services.AddMvc().AddViewLocalization(
                 LanguageViewLocationExpanderFormat.Suffix,
                 options => options.ResourcesPath = "Localization")
                 .AddDataAnnotationsLocalization();
+            services.AddSingleton<IUserService, UserService>();
+            services.AddSingleton<IGameInvitationService, GameInvitationService>();
+            services.Configure<Options.EmailServiceOptions>(_configuration.GetSection("Email"));
+            services.AddEmailService(_hostingEnvironment, _configuration);
+            services.AddRouting();
+            services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
         }
+
+        public void ConfigureDevelopmentServices(IServiceCollection services)
+        {
+            ConfigureCommonServices(services);
+        }
+
+        public void ConfigureStagingServices(IServiceCollection services)
+        {
+            ConfigureCommonServices(services);
+        }
+
+        public void ConfigureProductionServices(IServiceCollection services)
+        {
+            ConfigureCommonServices(services);
+        }
+
+        //public void ConfigureServices(IServiceCollection services)
+        //{         
+        //    services.AddDirectoryBrowser();
+        //    services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
+        //    services.AddSingleton<IUserService, UserService>();
+        //    services.Configure<Options.EmailServiceOptions>(_configuration.GetSection("Email"));
+        //    services.AddSingleton<IEmailService, EmailService>();
+        //    services.AddSingleton<IGameInvitationService, GameInvitationService>();
+        //    services.AddLocalization(options => options.ResourcesPath = "Localization");
+        //    services.AddMvc().AddViewLocalization(
+        //        LanguageViewLocationExpanderFormat.Suffix,
+        //        options => options.ResourcesPath = "Localization")
+        //        .AddDataAnnotationsLocalization();
+        //}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
