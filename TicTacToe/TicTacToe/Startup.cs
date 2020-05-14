@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using TicTacToe.Services;
 using TicTacToe.Extensions;
 using Microsoft.Extensions.Configuration;
+using TicTacToe.Filters;
 
 namespace TicTacToe
 {
@@ -33,9 +34,10 @@ namespace TicTacToe
         public void ConfigureCommonServices(IServiceCollection services)
         {
             services.AddLocalization(options => options.ResourcesPath = "Localization");
-            services.AddMvc().AddViewLocalization(
-                LanguageViewLocationExpanderFormat.Suffix,
-                options => options.ResourcesPath = "Localization")
+            services.AddMvc(o => o.Filters.Add(typeof(DetectMobileFilter)))
+                .AddViewLocalization(
+                    LanguageViewLocationExpanderFormat.Suffix,
+                    options => options.ResourcesPath = "Localization")
                 .AddDataAnnotationsLocalization();
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IGameInvitationService, GameInvitationService>();

@@ -63,9 +63,9 @@
     </nav>
 
     <div class="container body-content">
-        @RenderSection("Desktop", required: false)
-        @{ 
-            IgnoreSection("Mobile");
+        @RenderSection("Mobile", required: false)
+        @{
+            IgnoreSection("Desktop");
         }
         @RenderBody()
         <hr />
