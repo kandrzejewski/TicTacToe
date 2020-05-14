@@ -1,0 +1,50 @@
+﻿@using Microsoft.AspNetCore.Http
+@model TicTacToe.Models.GameSessionModel
+@{
+    var email = Context.Session.GetString("email");
+}
+@if (Model.ActiveUser?.Email == email)
+{
+    <table>
+        @for (int rows = 0; rows < 3; rows++)
+        {
+            <tr style="height:150px;">
+                @for (int columns = 0; columns < 3; columns++)
+                {
+                    <td style="width:150px; border:1px solid #808080">
+                        @{
+                            var position = Model.Turns?.FirstOrDefault(turn => turn.X == columns
+                            && turn.Y == rows);
+
+                            if (position != null)
+                            {
+                                if (position.User?.Email == "Player1")
+                                {
+                                    <ion-icon name="radio-button-off-sharp"></ion-icon>
+                                }
+                                else
+                                {
+                                    <ion-icon name="close-sharp"></ion-icon>
+                                }
+                            }
+                            else
+                            {
+                                <a asp-action="SetPosition" asp-controller="GameSession" 
+                                   asp-route-id="@Model.Id" asp-route-email="@email"
+                                   class="btn" style="width:150px; min-height:150px;">
+                                    &nbsp;
+                                </a>
+                            }
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <div class="alert">
+        <ion-icon name="warning-outline">Proszę czekać, aż drugi użytkownik skończy kolejkę.</ion-icon>
+    </div>
+}

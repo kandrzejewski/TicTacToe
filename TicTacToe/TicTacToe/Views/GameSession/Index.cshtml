@@ -1,0 +1,30 @@
+﻿@model TicTacToe.Models.GameSessionModel
+@section Desktop{
+    <h1>Rozgrywka @Model.Id</h1>
+    <h2>Rozpoczęta o @(DateTime.Now.ToShortTimeString())</h2>
+    <div class="alert alert-info">
+        <table class="table">
+            <tr>
+                <td>Użytkownik 1:</td>
+                <td>@Model.User1?.Email <ion-icon name="radio-button-off-sharp"></ion-icon></td>
+            </tr>
+            <tr>
+                <td>Użytkownik 2:</td>
+                <td>@Model.User2?.Email <ion-icon name="close-sharp"></ion-icon></td>
+            </tr>
+        </table>
+    </div>
+}
+@section Mobile{
+    <h1>Rozgrywka @Model.Id</h1>
+    <h2>Rozpoczęta o @(DateTime.Now.ToShortTimeString())</h2>
+    Użytkownik 1: @Model.User1?.Email <ion-icon name="radio-button-off-sharp"></ion-icon>
+    Użytkownik 2: @Model.User2?.Email <ion-icon name="close-sharp"></ion-icon>
+}
+
+@section Scripts{
+    <script type="module" src="https://unpkg.com/ionicons@5.0.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule="" src="https://unpkg.com/ionicons@5.0.0/dist/ionicons/ionicons.js"></script>
+}
+
+<vc:game-session game-session-id="@Model.Id"></vc:game-session>

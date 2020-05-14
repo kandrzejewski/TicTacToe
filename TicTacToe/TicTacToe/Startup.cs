@@ -42,6 +42,7 @@ namespace TicTacToe
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IGameInvitationService, GameInvitationService>();
             services.Configure<Options.EmailServiceOptions>(_configuration.GetSection("Email"));
+            services.AddSingleton<IGameSessionService, GameSessionService>();
             services.AddEmailService(_hostingEnvironment, _configuration);
             services.AddRouting();
             services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));

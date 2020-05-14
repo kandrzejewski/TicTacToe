@@ -1,0 +1,32 @@
+﻿@model IEnumerable<TicTacToe.Models.UserModel>
+@{
+    ViewData["Title"] = "Strona główna";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        @section Desktop {<h2>@Localizer["DesktopTitle"] (@Localizer["LastUpdate"] @(System.DateTime.Now))</h2>}
+        @section Mobile {<h2>@Localizer["MobileTitle"] (@Localizer["LastUpdate"] @(System.DateTime.Now))</h2>}
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>@Localizer["Gamer"]</th>
+                    <th>E-mail</th>
+                    <th>@Localizer["Score"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.FirstName @user.LastName</td>
+                        <td>@user.Email</td>
+                        <td>@user.Score.ToString()</td>
+                    </tr>  
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TicTacToe.Models;
@@ -30,6 +31,14 @@ namespace TicTacToe.Services
                 userModel
             };
             return Task.CompletedTask;
+        }
+
+        public Task<IEnumerable<UserModel>> GetTopUsers(int numberOfUsers)
+        {
+            return Task.Run(() => (IEnumerable<UserModel>)_userStore
+                .OrderBy(x => x.Score)
+                .Take(numberOfUsers)
+                .ToList());
         }
     }
 }

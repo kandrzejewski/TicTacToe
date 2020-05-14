@@ -20,7 +20,7 @@ var openSocket = function (parameter, strAction) {
         wsUri = protocol + "//" + window.location.host + "/CheckEmailConfirmationStatus";
         operation = "CheckEmailConfirmationStatus";
     }
-    else if (strAction == "Gameinvitation") {
+    else if (strAction == "GameInvitation") {
         wsUri = protocol + "//" + window.location.host + "/GameInvitationConfirmation";
         operation = "CheckGameInvitationConfirmationStatus";
     }
@@ -32,7 +32,7 @@ var openSocket = function (parameter, strAction) {
             window.location.href = "/GameInvitation?email=" + parameter;
         }
         else if (strAction == "GameInvitation") {
-            var data = $.praseJSON(response.data);
+            var data = $.parseJSON(response.data);
             if (data.Result == "OK")
                 window.location.href = "/GameSession/Index/" + data.Id;
         }

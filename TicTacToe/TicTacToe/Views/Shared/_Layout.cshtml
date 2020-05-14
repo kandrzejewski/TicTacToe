@@ -26,45 +26,12 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Kółko i krzyżyk</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Strona Główna <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">O aplikacji</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Kontakt</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ustawienia</a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <li class="dropdown-submenu">
-                            <a class="dropdown-my-item dropdown-toggle" href="#" id="navbarDropdownSubMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Wybierz język (@ViewBag.Language)</a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownSubMenuLink">
-                                <li @(ViewBag.Language == "EN" ? "active" : "")>
-                                    <a class="dropdown-my-item" asp-controller="Home" asp-action="SetCulture" asp-route-culture="EN">Angielski</a>
-                                </li>
-                                <li @(ViewBag.Language == "PL" ? "active" : "")>
-                                    <a class="dropdown-my-item" asp-controller="Home" asp-action="SetCulture" asp-route-culture="PL">Polski</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </nav>
+    @Html.Partial("_Menu")
 
     <div class="container body-content">
         @RenderSection("Desktop", required: false)
-        @{ 
+        @if (IsSectionDefined("Mobile"))
+        {
             IgnoreSection("Mobile");
         }
         @RenderBody()

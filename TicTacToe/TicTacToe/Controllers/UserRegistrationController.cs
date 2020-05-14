@@ -61,7 +61,7 @@ namespace TicTacToe.Controllers
 
             if (user?.IsEmailConfirmed == true)
                 return RedirectToAction("Index", "GameInvitation",
-                    new { email = email });
+                    new { email });
 
             ViewBag.Email = email;
             return View();
