@@ -50,8 +50,10 @@ namespace TicTacToe.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string email)
         {
-            var gameInvitationModel = new GameInvitationModel { InvitedBy = email };
-            HttpContext.Session.SetString("email", email);
+            var gameInvitationModel = new GameInvitationModel { InvitedBy = email, Id = Guid.NewGuid() };
+            Request.HttpContext.Session.SetString("email", email);
+            var user = await _userService.GetUserByEmail(email);
+            Request.HttpContext.Session.SetString("displayName", $"{user.FirstName} {user.LastName}");
             return View(gameInvitationModel);
         }
 

@@ -1,4 +1,10 @@
-﻿<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+﻿@using Microsoft.AspNetCore.Http;
+@{
+    var email = Context.Session.GetString("email");
+    var displayName = Context.Session.GetString("displayName");
+}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Kółko i krzyżyk</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -33,6 +39,15 @@
                     </li>
                 </ul>
             </li>
+            @if (!string.IsNullOrEmpty(email))
+            {
+                Html.RenderPartial("_Account",
+                    new TicTacToe.Models.AccountModel
+                    {
+                        Email = email,
+                        DisplayName = displayName
+                    });
+            }
         </ul>
     </div>
 </nav>

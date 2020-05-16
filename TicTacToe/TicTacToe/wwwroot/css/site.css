@@ -104,3 +104,42 @@ input[type="checkbox"].input-validation-error {
     color: rgba(255, 255, 255, 0.75) ;
 }
 
+
+hr {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+#connected-dp {
+    min-width:350px;
+}
+
+ion-icon {
+    color: #ffc107;
+    --ionicon-stroke-width: 60px;
+}
+
+
+/*Menu logowania*/
+#login_menu {
+    color: rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+#login_menu:hover {
+    color: rgb(255, 255, 255);
+}
+
+#login_menu > a {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+}
+
+#login_menu > a:hover {
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+}
