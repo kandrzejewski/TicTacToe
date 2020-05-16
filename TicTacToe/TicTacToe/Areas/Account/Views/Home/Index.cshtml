@@ -1,0 +1,28 @@
+﻿@model TicTacToe.Models.UserModel
+
+<h3>Szczegóły konta</h3>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-sm-6 col-md-6">
+            <div class="card card-body">
+                <div class="row">
+                    <div class="col-sm-6 col-md-4">
+                        <Gravatar email="@Model.Email"></Gravatar>
+                    </div>
+                    <div class="col-sm-6 col-md-8">
+                        <h4>@($"{Model.FirstName} {Model.LastName}")</h4>
+                        <p>
+                            <ion-icon name="mail-outline"></ion-icon>&nbsp;
+                            <a href="mailto:@Model.Email">@Model.Email</a>
+                        </p>
+                        <p>
+                            <ion-icon name="calendar-outline"></ion-icon>&nbsp;
+                            @Model.EmailCofirmationDate
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
