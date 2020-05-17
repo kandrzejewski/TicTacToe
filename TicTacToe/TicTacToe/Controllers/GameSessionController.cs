@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 using TicTacToe.Services;
 
 namespace TicTacToe.Controllers
@@ -27,6 +27,13 @@ namespace TicTacToe.Controllers
                 session = await _gameSessionService.CreateGameSession(invitation.Id, invitation.InvitedBy, invitation.EmailTo);
             }
             return View(session);
+        }
+
+        public async Task<IActionResult> SetPosition(Guid id, string email, int x, int y)
+        {
+            var gameSession = await _gameSessionService.GetGameSession(id);
+            await _gameSessionService.AddTurn(gameSession.Id, email, x, y);
+            return View("Index", gameSession);
         }
     }
 }

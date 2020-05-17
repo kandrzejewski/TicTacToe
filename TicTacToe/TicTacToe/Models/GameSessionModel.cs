@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace TicTacToe.Models
 {
@@ -15,6 +13,7 @@ namespace TicTacToe.Models
         public IEnumerable<TurnModel> Turns { get; set; }
         public UserModel Winner { get; set; }
         public UserModel ActiveUser { get; set; }
+        public Guid WinnerId { get; set; }
         public Guid ActiveUserId { get; set; }
         public bool TurnFinished { get; set; }
     }

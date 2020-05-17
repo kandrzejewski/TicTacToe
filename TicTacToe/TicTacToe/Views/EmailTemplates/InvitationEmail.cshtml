@@ -1,0 +1,9 @@
+﻿@model TicTacToe.Models.InvitationEmailModel
+@{
+    ViewData["Title"] = "Widok";
+    Layout = "~/Views/Shared/_LayoutEmail.cshtml";
+}
+
+<h1>Witaj, @Model.DisplayName</h1>
+@($"{Model.InvitedBy.FirstName} {Model.InvitedBy.LastName}")  zaprasza Cię do gry Kółko i krzyżyk.
+Proszę kliknąć <a href="@Model.ConfirmationUrl">tutaj</a>, aby dołaczyć do gry.

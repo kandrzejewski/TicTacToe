@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
+using System;
+using System.Threading.Tasks;
 
 
 namespace TicTacToe.Services
@@ -14,15 +12,21 @@ namespace TicTacToe.Services
         private static readonly string _culturePrefix = "c=";
         private static readonly string _uiCulturePrefix = "uic=";
 
-        public override async Task<ProviderCultureResult> 
+        public override async Task<ProviderCultureResult>
             DetermineProviderCultureResult(HttpContext httpContext)
         {
             if (GetCultureFromQueryString(httpContext, out string culture))
+            {
                 return new ProviderCultureResult(culture, culture);
+            }
             else if (GetCultureFromCookie(httpContext, out culture))
+            {
                 return new ProviderCultureResult(culture, culture);
+            }
             else if (GetCultureFromSession(httpContext, out culture))
+            {
                 return new ProviderCultureResult(culture, culture);
+            }
 
             return await NullProviderCultureResult;
         }
@@ -34,7 +38,7 @@ namespace TicTacToe.Services
                 throw new ArgumentNullException(nameof(httpContext));
             }
 
-            var request = httpContext.Request;
+            HttpRequest request = httpContext.Request;
             if (!request.QueryString.HasValue)
             {
                 culture = null;
@@ -52,7 +56,7 @@ namespace TicTacToe.Services
                 throw new ArgumentNullException(nameof(httpContext));
             }
 
-            var cookie = httpContext.Request.Cookies["culture"];
+            string cookie = httpContext.Request.Cookies["culture"];
             if (string.IsNullOrEmpty(cookie))
             {
                 culture = null;
@@ -70,33 +74,33 @@ namespace TicTacToe.Services
                 return null;
             }
 
-            var parts = value.Split(_cookieSeparator, StringSplitOptions.RemoveEmptyEntries);
-            if(parts.Length != 2)
+            string[] parts = value.Split(_cookieSeparator, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 2)
             {
                 return null;
             }
 
-            var potentialCultureName = parts[0];
-            var potentialUICultureName = parts[1];
-            if(!potentialCultureName.StartsWith(_culturePrefix) ||
+            string potentialCultureName = parts[0];
+            string potentialUICultureName = parts[1];
+            if (!potentialCultureName.StartsWith(_culturePrefix) ||
                 !potentialUICultureName.StartsWith(_uiCulturePrefix))
             {
                 return null;
             }
 
-            var cultureName = potentialCultureName.Substring(_culturePrefix.Length);
-            var uiCultureName = potentialUICultureName.Substring(_uiCulturePrefix.Length);
-            if(cultureName == null && uiCultureName == null)
+            string cultureName = potentialCultureName.Substring(_culturePrefix.Length);
+            string uiCultureName = potentialUICultureName.Substring(_uiCulturePrefix.Length);
+            if (cultureName == null && uiCultureName == null)
             {
                 return null;
             }
 
-            if(cultureName != null && uiCultureName == null)
+            if (cultureName != null && uiCultureName == null)
             {
                 uiCultureName = cultureName;
             }
-           
-            if(cultureName == null && uiCultureName != null)
+
+            if (cultureName == null && uiCultureName != null)
             {
                 cultureName = uiCultureName;
             }

@@ -2,9 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using TicTacToe.Helpers;
 
@@ -27,16 +25,18 @@ namespace TicTacToe.Services
         public async Task<string> RenderTemplate<T>(string templateName,
             T model, string host) where T : class
         {
-            var html = await new EmailViewRenderHelper()
+            string html = await new EmailViewRenderHelper()
                 .RenderTemplate(templateName, _hostEnvironment,
                     _configuration, _httpContextAccessor, model);
-            var targetDir = Path.Combine(Directory.GetCurrentDirectory(),
+            string targetDir = Path.Combine(Directory.GetCurrentDirectory(),
                 "wwwroot", "Emails");
             if (!Directory.Exists(targetDir))
+            {
                 Directory.CreateDirectory(targetDir);
+            }
 
             string dateTime = DateTime.Now.ToString("ddMMHHyyHHmmss");
-            var targetFileName = Path.Combine(targetDir, templateName
+            string targetFileName = Path.Combine(targetDir, templateName
                 .Replace("/", "_")
                 .Replace("\\", "_") + "." + dateTime + ".html");
             html = html.Replace("{ViewOnLine}",

@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using TicTacToe.Services;
-using TicTacToe.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
+using TicTacToe.Models;
+using TicTacToe.Services;
+
 
 namespace TicTacToe.Controllers
 {
     public class UserRegistrationController : Controller
     {
-        private readonly IUserService _userService;
-        private readonly IEmailService _emailService;
+        readonly IUserService _userService;
+        readonly IEmailService _emailService;
 
         public UserRegistrationController(IUserService userService, IEmailService emailService)
         {
@@ -34,7 +33,10 @@ namespace TicTacToe.Controllers
                 //return Content($"Użytkownik {userModel.FirstName} {userModel.LastName} został pomyślnie zarejestrowany.");
                 return RedirectToAction(nameof(EmailConfirmation), new { userModel.Email });
             }
-            return View(userModel);
+            else
+            {
+                return View(userModel);
+            }  
         }
 
         [HttpGet]
@@ -56,6 +58,7 @@ namespace TicTacToe.Controllers
                 Email = email,
                 ActionUrl = Url.Action(urlAction)
             };
+
             var emailRenderService = HttpContext.RequestServices.GetService<IEmailTemplateRenderService>();
             var message = await emailRenderService.RenderTemplate(
                 "EmailTemplates/UserRegistrationEmail",

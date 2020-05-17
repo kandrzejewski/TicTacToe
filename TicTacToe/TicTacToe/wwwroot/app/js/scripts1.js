@@ -5,8 +5,8 @@ function EmailConfirmation(email) {
         openSocket(email, "Email");
     }
     else {
-        alert("Gniazda WebSockets nie są aktywne")
-        interval = setInterval(function () {
+        alert("Gniazda WebSockets nie są aktywne");
+        interval = setInterval(() => {
             CheckEmailConfirmationStatus(email);
         }, 5000);
     }
@@ -19,7 +19,7 @@ function GameInvitationConfirmation(id) {
     }
     else {
         alert("Gniazda WebSockets nie są aktywne");
-        interval = setInterval(function () {
+        interval = setInterval(() => {
             CheckGameInvitationConfirmationStatus(id);
         }, 5000);
     }

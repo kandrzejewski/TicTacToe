@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
@@ -13,7 +11,7 @@ namespace TicTacToe.Services
     public class EmailService : IEmailService
     {
         private readonly EmailServiceOptions _emailServiceOptions;
-        readonly ILogger<EmailService> _logger;
+        private readonly ILogger<EmailService> _logger;
 
         public EmailService(IOptions<EmailServiceOptions> emailServiceOptions, ILogger<EmailService> logger)
         {
@@ -27,14 +25,20 @@ namespace TicTacToe.Services
             {
                 _logger.LogInformation($"##Start metody sendEmail## Rozpoczęcie wysyłania wiadomości do {emailTo}");
 
-                using (var client = new SmtpClient(_emailServiceOptions.MailServer,
+                using (SmtpClient client = new SmtpClient(_emailServiceOptions.MailServer,
                 int.Parse(_emailServiceOptions.MailPort)))
                 {
                     if (bool.Parse(_emailServiceOptions.UseSSL) == true)
+                    {
                         client.EnableSsl = true;
+                    }
+
                     if (!string.IsNullOrEmpty(_emailServiceOptions.UserId))
+                    {
                         client.Credentials = new NetworkCredential(_emailServiceOptions.UserId,
                             _emailServiceOptions.Password);
+                    }
+
                     client.Send(new MailMessage("example@example.com", emailTo, subject, message));
                 }
             }

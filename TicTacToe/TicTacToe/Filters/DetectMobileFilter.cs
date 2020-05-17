@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+
 
 namespace TicTacToe.Filters
 {
@@ -16,7 +13,7 @@ namespace TicTacToe.Filters
         public static bool IsMobileUserAgent(ActionExecutedContext context)
         {
             string userAgent = context.HttpContext.Request.Headers["User-Agent"].ToString();
-            if(context.HttpContext !=null && userAgent != null)
+            if(context.HttpContext != null && userAgent != null)
             {
                 if (userAgent.Length < 4)
                     return false;
@@ -28,9 +25,10 @@ namespace TicTacToe.Filters
         
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            var viewResult = context.Result as ViewResult;
+            ViewResult viewResult = context.Result as ViewResult;
             if (viewResult == null)
                 return;
+
             if (IsMobileUserAgent(context))
             {
                 viewResult.ViewData["Layout"] = "~/Views/Shared/_LayoutMobile.cshtml";

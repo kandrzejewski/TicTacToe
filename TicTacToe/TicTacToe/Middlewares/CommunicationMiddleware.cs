@@ -1,13 +1,14 @@
-﻿using TicTacToe.Services;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Text;
 using System;
 using System.Net.WebSockets;
 using System.IO;
-using Newtonsoft.Json;
-using Microsoft.Extensions.DependencyInjection;
+using TicTacToe.Services;
+using TicTacToe.Models;
 
 namespace TicTacToe.Middlewares
 {
@@ -29,8 +30,8 @@ namespace TicTacToe.Middlewares
                 var webSocket = await context.WebSockets.AcceptWebSocketAsync();
                 var ct = context.RequestAborted;
                 var json = await ReceiveStringAsync(webSocket, ct);
-                Console.WriteLine(json);
                 var command = JsonConvert.DeserializeObject<dynamic>(json);
+
                 switch (command.Operation.ToString())
                 {
                     case "CheckEmailConfirmationStatus":
@@ -108,6 +109,7 @@ namespace TicTacToe.Middlewares
                 ms.Seek(0, SeekOrigin.Begin);
                 if (result.MessageType != WebSocketMessageType.Text)
                     throw new Exception("Nieoczekiwany komunikat");
+
                 using (StreamReader reader = new StreamReader(ms, Encoding.UTF8))
                 {
                     return await reader.ReadToEndAsync();
@@ -117,7 +119,7 @@ namespace TicTacToe.Middlewares
 
         public async Task ProcessEmailConfirmation(HttpContext context, WebSocket webSocket, CancellationToken ct, string email)
         {
-            Models.UserModel user = await _userService.GetUserByEmail(email);
+            UserModel user = await _userService.GetUserByEmail(email);
             while(!ct.IsCancellationRequested && !webSocket.CloseStatus.HasValue && user?.IsEmailConfirmed == false)
             {
                 if (user.IsEmailConfirmed)
@@ -179,10 +181,10 @@ namespace TicTacToe.Middlewares
                     gameInvitationModel.EmailTo,
                     gameInvitationModel.Id
                 }), ct);
-            }
 
-            Task.Delay(500).Wait();
-            gameInvitationModel = await gameInvitationService.Get(id);
+                Task.Delay(500).Wait();
+                gameInvitationModel = await gameInvitationService.Get(id);
+            }
         }
     }
 }

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -11,8 +8,8 @@ namespace TicTacToe.Models
     {
         public Guid ID { get; set; }
 
-        [Display(Name ="FirstName")]
-        [Required(ErrorMessage ="FirstNameRequired")]
+        [Display(Name = "FirstName")]
+        [Required(ErrorMessage = "FirstNameRequired")]
         public string FirstName { get; set; }
 
         [Display(Name = "LastName")]
