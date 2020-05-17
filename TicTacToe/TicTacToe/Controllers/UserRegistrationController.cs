@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using TicTacToe.Services;
 using TicTacToe.Models;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TicTacToe.Controllers
 {
@@ -45,10 +46,21 @@ namespace TicTacToe.Controllers
                 Action = "ConfirmEmail",
                 Controller = "UserRegistration",
                 Values = new { email },
+                Protocol = Request.Scheme,
                 Host = Request.Host.ToString()
             };
 
-            var message = $"Dziękujemy za rejestracje na naszej stronie. Aby potwierdzić adres e-mail, proszę kliknąć tutaj {Url.Action(urlAction)}";
+            var userRegistrationEmail = new UserRegistrationEmailModel
+            {
+                DisplayName = $"{user.FirstName} {user.LastName}",
+                Email = email,
+                ActionUrl = Url.Action(urlAction)
+            };
+            var emailRenderService = HttpContext.RequestServices.GetService<IEmailTemplateRenderService>();
+            var message = await emailRenderService.RenderTemplate(
+                "EmailTemplates/UserRegistrationEmail",
+                userRegistrationEmail, Request.Host.ToString());
+
             try
             {
                 _emailService.SendEmail(email,

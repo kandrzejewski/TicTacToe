@@ -142,8 +142,10 @@ namespace TicTacToe.Middlewares
             var id = httpContext.Request.Query["id"];
             if (string.IsNullOrEmpty(id))
                 await httpContext.Response.WriteAsync("Nieprawidłowe rządanie: Wymagany jest identyfikator id");
+            
             var gameInvitationService = httpContext.RequestServices.GetService<IGameInvitationService>();
             var gameInvitationModel = await gameInvitationService.Get(Guid.Parse(id));
+            
             if (gameInvitationModel.IsConfirmed)
                 await httpContext.Response.WriteAsync(
                     JsonConvert.SerializeObject(new

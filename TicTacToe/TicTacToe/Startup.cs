@@ -14,6 +14,8 @@ using TicTacToe.Services;
 using TicTacToe.Extensions;
 using Microsoft.Extensions.Configuration;
 using TicTacToe.Filters;
+using TicTacToe.ViewEngines;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace TicTacToe
 {
@@ -44,6 +46,9 @@ namespace TicTacToe
             services.Configure<Options.EmailServiceOptions>(_configuration.GetSection("Email"));
             services.AddSingleton<IGameSessionService, GameSessionService>();
             services.AddEmailService(_hostingEnvironment, _configuration);
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddTransient<IEmailViewEngine, EmailViewEngine>();
+            services.AddTransient<IEmailTemplateRenderService, EmailTemplateRenderService>();
             services.AddRouting();
             services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
         }
