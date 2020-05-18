@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace TicTacToe
 {
@@ -23,7 +17,7 @@ namespace TicTacToe
                     webBuilder.CaptureStartupErrors(true)
                     .PreferHostingUrls(true)
                     .UseUrls("http://localhost:5000")
-                        .UseStartup<Startup>();
+                    .UseStartup<Startup>();
                 });
     }
 }

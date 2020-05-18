@@ -1,8 +1,9 @@
 {
   "version": "1.0",
-  "defaultProvider": "unpkg",
+  "defaultProvider": "cdnjs",
   "libraries": [
     {
+      "provider": "unpkg",
       "library": "bootstrap@4.4.1",
       "destination": "wwwroot/lib/bootstrap/",
       "files": [
@@ -29,31 +30,17 @@
       ]
     },
     {
-      "library": "jquery-validation@1.19.1",
-      "destination": "wwwroot/lib/jquery-validation/",
-      "files": [
-        "dist/additional-methods.js",
-        "dist/additional-methods.min.js",
-        "dist/jquery.validate.js",
-        "dist/jquery.validate.min.js"
-      ]
+      "library": "jquery-validation-unobtrusive@3.2.11",
+      "destination": "wwwroot/lib/jquery-validation-unobtrusive/"
     },
     {
-      "library": "jquery-validation-unobtrusive@3.2.11",
-      "destination": "wwwroot/lib/jquery-validation-unobtrusive/",
-      "files": [
-        "dist/jquery.validate.unobtrusive.js",
-        "dist/jquery.validate.unobtrusive.min.js"
-      ]
+      "provider": "jsdelivr",
+      "library": "jquery-validation@1.19.1",
+      "destination": "wwwroot/lib/jquery-validation/"
     },
     {
       "library": "jquery@3.4.1",
-      "destination": "wwwroot/lib/jquery/",
-      "files": [
-        "dist/jquery.js",
-        "dist/jquery.min.js",
-        "dist/jquery.min.map"
-      ]
+      "destination": "wwwroot/lib/jquery/dist"
     }
   ]
 }

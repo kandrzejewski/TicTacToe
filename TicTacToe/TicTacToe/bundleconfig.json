@@ -11,7 +11,8 @@
       "wwwroot/app/js/scripts1.js",
       "wwwroot/app/js/scripts2.js"
     ],
-    "sourceMap": true
+    "sourceMap": true,
+    "includeInProject": true
   },
   {
     "outputFileName": "wwwroot/js/site.min.js",
@@ -21,12 +22,13 @@
     "minify": {
       "enabled": true,
       "renameLocals": true
-    }
+    },
+    "sourceMap": false
   },
   {
-    "outputFileName": "wwwroot/lib/jquery/jquery.min.js",
+    "outputFileName": "wwwroot/lib/jquery/dist/jquery.min.js",
     "inputFiles": [
-      "wwwroot/lib/jquery/jquery.js"
+      "wwwroot/lib/jquery/dist/jquery.js"
     ]
   }
 ]

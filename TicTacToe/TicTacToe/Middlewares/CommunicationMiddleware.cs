@@ -79,7 +79,7 @@ namespace TicTacToe.Middlewares
             {
                 await context.Response.WriteAsync("Oczekiwanie na potwierdzenie adresu e-mail");
                 user.IsEmailConfirmed = true;
-                user.EmailCofirmationDate = DateTime.Now;
+                user.EmailConfirmationDate = DateTime.Now;
                 _userService.UpdateUser(user).Wait();
             }
         }
@@ -129,7 +129,7 @@ namespace TicTacToe.Middlewares
                 else
                 {
                     user.IsEmailConfirmed = true;
-                    user.EmailCofirmationDate = DateTime.Now;
+                    user.EmailConfirmationDate = DateTime.Now;
                     await _userService.UpdateUser(user);
                     await SendStringAsync(webSocket, "OK", ct);
                 }
