@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TicTacToe.Models;
@@ -34,6 +35,18 @@ namespace TicTacToe.Services
         public Task<GameInvitationModel> Get(Guid id)
         {
             return Task.FromResult(_gameInvitations.FirstOrDefault(x => x.Id == id));
+        }
+
+        public Task<IEnumerable<GameInvitationModel>> All()
+        {
+            return Task.FromResult<IEnumerable<GameInvitationModel>>(_gameInvitations.ToList());
+        }
+
+        public Task Delete(Guid id)
+        {
+            _gameInvitations = new ConcurrentBag<GameInvitationModel>(
+                _gameInvitations.Where(x => x.Id != id));
+            return Task.CompletedTask;
         }
     }
 }
