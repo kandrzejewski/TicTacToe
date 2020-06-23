@@ -24,14 +24,14 @@ namespace TicTacToe.Services
 
         public Task<GameSessionModel> GetGameSession(Guid gameSessionId)
         {
-            return Task.Run(() => _session
-                .FirstOrDefault(x => x.Id == gameSessionId));
+            return Task.Run(() => _session.FirstOrDefault(x => x.Id == gameSessionId));
         }
 
         public async Task<GameSessionModel> CreateGameSession(Guid invitationId, string invitedByEmail, string invitedPlayerEmail)
         {
             var invitedBy = await _UserService.GetUserByEmail(invitedByEmail);
             var invitedPlayer = await _UserService.GetUserByEmail(invitedPlayerEmail);
+
             GameSessionModel session = new GameSessionModel
             {
                 User1 = invitedBy,
@@ -46,8 +46,8 @@ namespace TicTacToe.Services
 
         public async Task<GameSessionModel> AddTurn(Guid id, string email, int x, int y)
         {
-            var gameSession = _session.FirstOrDefault(session => session.Id == id);
             List<TurnModel> turns;
+            var gameSession = _session.FirstOrDefault(session => session.Id == id);
             if (gameSession.Turns != null && gameSession.Turns.Any())
                 turns = new List<TurnModel>(gameSession.Turns);
             else
@@ -57,8 +57,12 @@ namespace TicTacToe.Services
             {
                 User = await _UserService.GetUserByEmail(email),
                 X = x,
-                Y = y
+                Y = y,
+                IconNumber = email == gameSession.User1?.Email ? "1" : "2"
             });
+
+            gameSession.Turns = turns;
+            gameSession.TurnNumber += 1; 
 
             if (gameSession.User1?.Email == email)
                 gameSession.ActiveUser = gameSession.User2;
@@ -66,8 +70,7 @@ namespace TicTacToe.Services
                 gameSession.ActiveUser = gameSession.User1;
 
             gameSession.TurnFinished = true;
-            _session = new ConcurrentBag<GameSessionModel>(_session
-                .Where(u => u.Id != id))
+            _session = new ConcurrentBag<GameSessionModel>(_session.Where(u => u.Id != id))
             {
                 gameSession
             };

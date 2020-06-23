@@ -9,6 +9,7 @@ namespace TicTacToe.Services
     public class GameInvitationService : IGameInvitationService
     {
         private static ConcurrentBag<GameInvitationModel> _gameInvitations;
+
         public GameInvitationService()
         {
             _gameInvitations = new ConcurrentBag<GameInvitationModel>();
@@ -16,10 +17,10 @@ namespace TicTacToe.Services
 
         public Task<GameInvitationModel> Add(GameInvitationModel gameInvitationModel)
         {
-            gameInvitationModel.Id = Guid.NewGuid();
             _gameInvitations.Add(gameInvitationModel);
             return Task.FromResult(gameInvitationModel);
         }
+
         public Task Update(GameInvitationModel gameInvitationModel)
         {
             _gameInvitations = new ConcurrentBag<GameInvitationModel>(
@@ -29,6 +30,7 @@ namespace TicTacToe.Services
             };
             return Task.CompletedTask;
         }
+
         public Task<GameInvitationModel> Get(Guid id)
         {
             return Task.FromResult(_gameInvitations.FirstOrDefault(x => x.Id == id));

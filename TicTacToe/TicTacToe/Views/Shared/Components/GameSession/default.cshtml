@@ -3,22 +3,20 @@
 @{
     var email = Context.Session.GetString("email");
 }
-@if (Model.ActiveUser?.Email == email)
-{
+
+<div id="gameBoard">
     <table>
-        @for (int rows = 0; rows < 3; rows++)
+        @for(int rows = 0; rows < 3; rows++)
         {
             <tr style="height:150px;">
                 @for (int columns = 0; columns < 3; columns++)
                 {
-                    <td style="width:150px; border:1px solid #808080">
+                    <td style="width:150px; border:1px solid #808080; text-align:center" id="@($"c_{rows}_{columns}")">
                         @{
-                            var position = Model.Turns?.FirstOrDefault(turn => turn.X == columns
-                            && turn.Y == rows);
-
+                            var position = Model.Turns?.FirstOrDefault(turn => turn.X == columns && turn.Y == rows);
                             if (position != null)
                             {
-                                if (position.User?.Email == "Player1")
+                                if (position.User == Model.User1)
                                 {
                                     <ion-icon name="radio-button-off-sharp"></ion-icon>
                                 }
@@ -29,11 +27,14 @@
                             }
                             else
                             {
-                                <a asp-action="SetPosition" asp-controller="GameSession" 
+                                <a class="btn btn-SetPosition" style="width:150px; min-height:150px;" data-X="@columns" data-Y="@rows">
+                                    &nbsp;
+                                </a>
+                                <!--<a asp-action="SetPosition" asp-controller="GameSession"
                                    asp-route-id="@Model.Id" asp-route-email="@email"
                                    class="btn" style="width:150px; min-height:150px;">
                                     &nbsp;
-                                </a>
+                                </a>-->
                             }
                         }
                     </td>
@@ -41,10 +42,8 @@
             </tr>
         }
     </table>
-}
-else
-{
-<div class="alert">
+</div>
+<div class="alert" id="divAlertWaitTurn">
     <a><ion-icon name="warning-outline"></ion-icon>Proszę czekać, aż drugi użytkownik skończy kolejkę.</a>
 </div>
-}
+

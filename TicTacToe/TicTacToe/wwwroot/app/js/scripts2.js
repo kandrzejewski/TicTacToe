@@ -54,9 +54,10 @@ var openSocket = function (parameter, strAction) {
 function CheckGameInvitationConfirmationStatus(id) {
     $.get("/GameInvitationConfirmation?id=" + id, function (data) {
         if (data.result === "OK") {
-            if (interval !== null)
+            if (interval !== null) {
                 clearInterval(interval);
+            }
             window.location.href = "/GameSession/Index/" + id;
-        }
+        }  
     });
 }

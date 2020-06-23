@@ -1,4 +1,9 @@
-﻿@model TicTacToe.Models.GameSessionModel
+﻿@using Microsoft.AspNetCore.Http
+@model TicTacToe.Models.GameSessionModel
+@{ 
+    var email = Context.Session.GetString("email");
+}
+
 @section Desktop{
     <h1>Rozgrywka @Model.Id</h1>
     <h2>Rozpoczęta o @(DateTime.Now.ToShortTimeString())</h2>
@@ -21,5 +26,20 @@
     Użytkownik 1: @Model.User1?.Email <ion-icon name="radio-button-off-sharp"></ion-icon>
     Użytkownik 2: @Model.User2?.Email <ion-icon name="close-sharp"></ion-icon>
 }
-
+<h3>E-mail użytkownika @email</h3>
+<h3>Aktywny użytkownik <span id="activeUser">@Model.ActiveUser?.Email</span></h3>
 <vc:game-session game-session-id="@Model.Id"></vc:game-session>
+@section Scripts{ 
+    <script>
+        SetGameSession("@Model.Id", "@email");
+        EnableCheckTurnIsFinished();
+        @if(email != Model.ActiveUser?.Email)
+        {
+            <text>DisableBoard(@Model.TurnNumber);</text>
+        }
+        else
+        {
+            <text>EnableBoard(@Model.TurnNumber);</text>
+        }
+    </script>
+}
