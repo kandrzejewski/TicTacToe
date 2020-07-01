@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,6 @@ namespace TicTacToe.Services
 {
     public class UserService : IUserService
     {
-        private static ConcurrentBag<UserModel> _userStore;
         private DbContextOptions<GameDbContext> _dbContextOptions;
 
         public UserService(DbContextOptions<GameDbContext> dbContextOptions)
@@ -18,15 +18,11 @@ namespace TicTacToe.Services
             _dbContextOptions = dbContextOptions;
         }
 
-        static UserService()
-        {
-            _userStore = new ConcurrentBag<UserModel>();
-        }
         public async Task<bool> RegisterUser(UserModel userModel)
         {
             //_userStore.Add(userModel);
             //return Task.FromResult(true);
-            using(var db = new GameDbContext(_dbContextOptions))
+            using (var db = new GameDbContext(_dbContextOptions))
             {
                 db.UserModels.Add(userModel);
                 await db.SaveChangesAsync();
@@ -39,6 +35,7 @@ namespace TicTacToe.Services
             using var db = new GameDbContext(_dbContextOptions);
             return await db.UserModels.FirstOrDefaultAsync(x => x.Email == email);
         }
+
         public async Task UpdateUser(UserModel userModel)
         {
             //_userStore = new ConcurrentBag<UserModel>(
@@ -66,6 +63,14 @@ namespace TicTacToe.Services
         {
             using var db = new GameDbContext(_dbContextOptions);
             return await db.UserModels.AnyAsync(user => user.Email == email);
+        }
+
+        public async Task DeleteUser(string email)
+        {
+            using var db = new GameDbContext(_dbContextOptions);
+            var user = GetUserByEmail(email).Result;
+            db.Remove(user);
+            await db.SaveChangesAsync();
         }
     }
 }
