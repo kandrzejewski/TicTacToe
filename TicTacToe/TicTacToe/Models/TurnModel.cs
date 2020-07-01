@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace TicTacToe.Models
 {
     public class TurnModel
     {
+        [Key]
         public Guid Id { get; set; }
         public Guid UserId { get; set; }
         public UserModel User { get; set; }

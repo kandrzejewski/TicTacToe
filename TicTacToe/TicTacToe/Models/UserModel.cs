@@ -6,6 +6,7 @@ namespace TicTacToe.Models
 {
     public class UserModel
     {
+        [Key]
         public Guid Id { get; set; }
 
         [Display(Name = "FirstName")]

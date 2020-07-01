@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using TicTacToe.Filters;
 using TicTacToe.ViewEngines;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using TicTacToe.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace TicTacToe
 {
@@ -48,8 +50,15 @@ namespace TicTacToe
             services.AddTransient<IEmailTemplateRenderService, EmailTemplateRenderService>();
             services.AddRouting();
             services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
-        }
 
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<GameDbContext>((serviceProvider, options) =>
+                options.UseSqlServer(connectionString)
+                .UseInternalServiceProvider(serviceProvider));
+            var dbContextOptionsbuilder = new DbContextOptionsBuilder<GameDbContext>()
+                .UseSqlServer(connectionString);
+            services.AddSingleton(dbContextOptionsbuilder.Options);
+        }
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
             ConfigureCommonServices(services);
@@ -130,6 +139,10 @@ namespace TicTacToe
 
             app.UseStatusCodePagesWithRedirects("/error/{0}");
 
+            using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<GameDbContext>().Database.Migrate();
+            }
         }
     }
 }
