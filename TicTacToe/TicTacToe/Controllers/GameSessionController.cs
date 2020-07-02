@@ -24,11 +24,17 @@ namespace TicTacToe.Controllers
         public async Task<IActionResult> Index(Guid id)
         {
             var session = await _gameSessionService.GetGameSession(id);
+            var userService = HttpContext.RequestServices.GetService<IUserService>();
+
             if(session == null)
             {
                 var gameInvitationService = Request.HttpContext.RequestServices.GetService<IGameInvitationService>();
                 var invitation = await gameInvitationService.Get(id);
-                session = await _gameSessionService.CreateGameSession(invitation.Id, invitation.InvitedBy, invitation.EmailTo);
+
+                var invitedPlayer = await userService.GetUserByEmail(invitation.EmailTo);
+                var invitedBy = await userService.GetUserByEmail(invitation.InvitedBy);
+
+                session = await _gameSessionService.CreateGameSession(invitation.Id, invitedBy, invitedPlayer);
             }
             return View(session);
         }
@@ -58,7 +64,7 @@ namespace TicTacToe.Controllers
                     if (gameSession.ActiveUser.Email != turn.User.Email)
                         return BadRequest($"{turn.User.Email} nie ma w tej chwili ruchu w grze");
 
-                    gameSession = await _gameSessionService.AddTurn(gameSession.Id, turn.User.Email, turn.X, turn.Y);
+                    gameSession = await _gameSessionService.AddTurn(gameSession.Id, turn.User, turn.X, turn.Y);
                     if (gameSession != null && gameSession.ActiveUser.Email != turn.User.Email)
                         return Ok(gameSession);
                     else

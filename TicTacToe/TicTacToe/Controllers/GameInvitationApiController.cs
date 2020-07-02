@@ -14,7 +14,7 @@ namespace TicTacToe.Controllers
     [ApiController]
     public class GameInvitationApiController : Controller
     {
-        private IGameInvitationService _gameInvitationService;
+        private readonly IGameInvitationService _gameInvitationService;
         private IUserService _userService;
 
         public GameInvitationApiController(IGameInvitationService gameInvitationService, IUserService userService)

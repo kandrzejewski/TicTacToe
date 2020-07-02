@@ -17,6 +17,7 @@ namespace TicTacToe.Data
         public DbSet<TurnModel> TurnModels { get; set; }
         public DbSet<UserModel> UserModels { get; set; }
         //public DbSet<UserRegistrationEmailModel> UserRegistrationEmailModels { get; set; }
+        public DbSet<RoleModel> RoleModels { get; set; }
         public GameDbContext(DbContextOptions<GameDbContext> dbContextOptions) 
             : base(dbContextOptions)
         {
@@ -26,9 +27,9 @@ namespace TicTacToe.Data
         {
             modelBuilder.RemovePluralizingTableNameConvention();
             modelBuilder.Entity(typeof(GameSessionModel))
-                .HasOne(typeof(UserModel), "User2")
+                .HasOne(typeof(UserModel), "Winner")
                 .WithMany()
-                .HasForeignKey("User2Id")
+                .HasForeignKey("WinnerId")
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

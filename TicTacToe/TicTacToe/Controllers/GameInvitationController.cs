@@ -1,22 +1,21 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TicTacToe.Models;
 using TicTacToe.Services;
-
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TicTacToe.Controllers
 {
     public class GameInvitationController : Controller
     {
-        private readonly IStringLocalizer<GameInvitationController> _stringLocalizer;
-        private readonly IUserService _userService;
-
-        public GameInvitationController(IUserService userService,
-            IStringLocalizer<GameInvitationController> stringLocalizer)
+        private IStringLocalizer<GameInvitationController> _stringLocalizer;
+        private IUserService _userService;
+        public GameInvitationController(IUserService userService, IStringLocalizer<GameInvitationController> stringLocalizer)
         {
             _userService = userService;
             _stringLocalizer = stringLocalizer;
@@ -33,10 +32,9 @@ namespace TicTacToe.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(GameInvitationModel gameInvitationModel,
-            [FromServices]IEmailService emailService)
+        public async Task<IActionResult> Index(GameInvitationModel gameInvitationModel, [FromServices]IEmailService emailService)
         {
-            var gameInvitationService = Request.HttpContext.RequestServices.GetService< IGameInvitationService >();
+            var gameInvitationService = Request.HttpContext.RequestServices.GetService<IGameInvitationService>();
             if (ModelState.IsValid)
             {
                 try
@@ -45,55 +43,38 @@ namespace TicTacToe.Controllers
                     {
                         DisplayName = $"{gameInvitationModel.EmailTo}",
                         InvitedBy = await _userService.GetUserByEmail(gameInvitationModel.InvitedBy),
-                        ConfirmationUrl = Url.Action("ConfirmGameInvitation",
-                            "GameInvitation",
-                            new { id = gameInvitationModel.Id },
-                            Request.Scheme, Request.Host.ToString()),
+                        ConfirmationUrl = Url.Action("ConfirmGameInvitation", "GameInvitation",
+                            new { id = gameInvitationModel.Id }, Request.Scheme, Request.Host.ToString()),
                         InvitedDate = gameInvitationModel.ConfirmationDate
                     };
 
                     var emailRenderService = HttpContext.RequestServices.GetService<IEmailTemplateRenderService>();
-                    var message = await emailRenderService.RenderTemplate<InvitationEmailModel>(
-                        "EmailTemplates/InvitationEmail",
-                        invitationModel,
-                        Request.Host.ToString());
-                    await emailService.SendEmail(gameInvitationModel.EmailTo,
-                        _stringLocalizer["Zaprosenie do gry Kółko i krzyżyk"],
-                        message);
+                    var message = await emailRenderService.RenderTemplate<InvitationEmailModel>("EmailTemplates/InvitationEmail", invitationModel, Request.Host.ToString());
+                    await emailService.SendEmail(gameInvitationModel.EmailTo, _stringLocalizer["Zaproszenie do gry Kółko i krzyżyk"], message);
                 }
                 catch
-                { 
+                {
 
                 }
-                //Wysyłanie e-maila bez generowania widoku
-                //emailService.SendEmail(gameInvitationModel.EmailTo,
-                //    _stringLocalizer["Zaprosenie do gry Kółko i krzyżyk"],
-                //    _stringLocalizer[$"Witaj, {0} zaprasza Cię do gry Kółko i krzyżyk. Aby dołączyć do gry kliknij tutaj {1}.",
-                //    gameInvitationModel.InvitedBy,
-                //    Url.Action("GameInvitationConfirmation", "GameInvitation", new
-                //    {
-                //        gameInvitationModel.InvitedBy,
-                //        gameInvitationModel.EmailTo
-                //    },
-                //    Request.Scheme,
-                //    Request.Host.ToString())]);
+
                 var invitation = gameInvitationService.Add(gameInvitationModel).Result;
-                return RedirectToAction("GameInvitationConfirmation", new { id = gameInvitationModel.Id });
+                return RedirectToAction("GameInvitationConfirmation", new { id = invitation.Id });
             }
             return View(gameInvitationModel);
         }
 
         [HttpGet]
-        public IActionResult GameInvitationConfirmation(Guid id,
-            [FromServices]IGameInvitationService gameInvitationService)
+        public async Task<IActionResult> GameInvitationConfirmation(Guid id, [FromServices]IGameInvitationService gameInvitationService)
         {
-            var gameInvitation = gameInvitationService.Get(id).Result;
-            return View(gameInvitation);
+            return await Task.Run(() =>
+            {
+                var gameInvitation = gameInvitationService.Get(id).Result;
+                return View(gameInvitation);
+            });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ConfirmGameInvitation(Guid id, 
-            [FromServices]IGameInvitationService gameInvitationService)
+        public async Task<IActionResult> ConfirmGameInvitation(Guid id, [FromServices]IGameInvitationService gameInvitationService)
         {
             var gameInvitation = await gameInvitationService.Get(id);
             gameInvitation.IsConfirmed = true;
@@ -104,7 +85,11 @@ namespace TicTacToe.Controllers
             {
                 Email = gameInvitation.EmailTo,
                 EmailConfirmationDate = DateTime.Now,
-                IsEmailConfirmed = true
+                EmailConfirmed = true,
+                FirstName = "",
+                LastName = "",
+                Password = "Azerty123!",
+                UserName = gameInvitation.EmailTo
             });
             return RedirectToAction("Index", "GameSession", new { id });
         }

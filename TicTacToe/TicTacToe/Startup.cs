@@ -3,18 +3,22 @@ using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.EntityFrameworkCore;
 using TicTacToe.Services;
 using TicTacToe.Extensions;
-using Microsoft.Extensions.Configuration;
 using TicTacToe.Filters;
 using TicTacToe.ViewEngines;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using TicTacToe.Data;
-using Microsoft.EntityFrameworkCore;
+using TicTacToe.Managers;
+using TicTacToe.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace TicTacToe
 {
@@ -36,29 +40,54 @@ namespace TicTacToe
         {
             services.AddLocalization(options => options.ResourcesPath = "Localization");
             services.AddMvc(o => o.Filters.Add(typeof(DetectMobileFilter)))
-                .AddViewLocalization(
-                    LanguageViewLocationExpanderFormat.Suffix,
-                    options => options.ResourcesPath = "Localization")
+                .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix, options => options.ResourcesPath = "Localization")
                 .AddDataAnnotationsLocalization();
-            services.AddSingleton<IUserService, UserService>();
-            services.AddSingleton<IGameInvitationService, GameInvitationService>();
-            services.Configure<Options.EmailServiceOptions>(_configuration.GetSection("Email"));
-            services.AddSingleton<IGameSessionService, GameSessionService>();
-            services.AddEmailService(_hostingEnvironment, _configuration);
-            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddTransient<IEmailViewEngine, EmailViewEngine>();
-            services.AddTransient<IEmailTemplateRenderService, EmailTemplateRenderService>();
-            services.AddRouting();
-            services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
+
+            services.AddTransient<ApplicationUserManager>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddScoped<IGameInvitationService, GameInvitationService>();
+            services.AddScoped<IGameSessionService, GameSessionService>();
 
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<GameDbContext>((serviceProvider, options) =>
                 options.UseSqlServer(connectionString)
                 .UseInternalServiceProvider(serviceProvider));
-            var dbContextOptionsbuilder = new DbContextOptionsBuilder<GameDbContext>()
-                .UseSqlServer(connectionString);
-            services.AddSingleton(dbContextOptionsbuilder.Options);
+            //var dbContextOptionsbuilder = new DbContextOptionsBuilder<GameDbContext>()
+            //    .UseSqlServer(connectionString);
+            //services.AddSingleton(dbContextOptionsbuilder.Options);
+            services.AddScoped(typeof(DbContextOptions<GameDbContext>), (serviceProvider) =>
+            {
+                return new DbContextOptionsBuilder<GameDbContext>().UseSqlServer(connectionString).Options;
+            });
+
+            services.Configure<Options.EmailServiceOptions>(_configuration.GetSection("Email"));
+            services.AddEmailService(_hostingEnvironment, _configuration);
+            services.AddTransient<IEmailTemplateRenderService, EmailTemplateRenderService>();
+            services.AddTransient<IEmailViewEngine, EmailViewEngine>();
+
+            services.AddRouting();
+            services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
+
+            services.AddIdentity<UserModel, RoleModel>(options =>
+            {
+                options.Password.RequiredLength = 1;
+                options.Password.RequiredUniqueChars = 0;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.SignIn.RequireConfirmedEmail = false;
+            }).AddEntityFrameworkStores<GameDbContext>()
+            .AddDefaultTokenProviders();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie();
+
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>(); 
         }
+
         public void ConfigureDevelopmentServices(IServiceCollection services)
         {
             ConfigureCommonServices(services);
@@ -74,21 +103,6 @@ namespace TicTacToe
             ConfigureCommonServices(services);
         }
 
-        //public void ConfigureServices(IServiceCollection services)
-        //{         
-        //    services.AddDirectoryBrowser();
-        //    services.AddSession(o => o.IdleTimeout = TimeSpan.FromMinutes(30));
-        //    services.AddSingleton<IUserService, UserService>();
-        //    services.Configure<Options.EmailServiceOptions>(_configuration.GetSection("Email"));
-        //    services.AddSingleton<IEmailService, EmailService>();
-        //    services.AddSingleton<IGameInvitationService, GameInvitationService>();
-        //    services.AddLocalization(options => options.ResourcesPath = "Localization");
-        //    services.AddMvc().AddViewLocalization(
-        //        LanguageViewLocationExpanderFormat.Suffix,
-        //        options => options.ResourcesPath = "Localization")
-        //        .AddDataAnnotationsLocalization();
-        //}
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -102,6 +116,8 @@ namespace TicTacToe
             }
 
             app.UseStaticFiles();
+
+            app.UseAuthentication(); //U¿ywanie uwierzytelniania
 
             app.UseSession();  //U¿ywanie sesji
 
@@ -122,8 +138,10 @@ namespace TicTacToe
                 SupportedCultures = supportedCultures,
                 SupportedUICultures = supportedCultures
             };
+
             localizationOptions.RequestCultureProviders.Clear();
             localizationOptions.RequestCultureProviders.Add(new CultureProviderResolverService());
+            
             app.UseRequestLocalization(localizationOptions);
 
             app.UseEndpoints(endpoints =>
@@ -137,11 +155,18 @@ namespace TicTacToe
                 endpoints.MapRazorPages();
             });
 
-            app.UseStatusCodePagesWithRedirects("/error/{0}");
+            app.UseStatusCodePages("text/plain", "Blad HTTP - kod odpowiedzi: {0}");
 
-            using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            //using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            //{
+            //    scope.ServiceProvider.GetRequiredService<GameDbContext>().Database.Migrate();
+            //}
+            var provider = app.ApplicationServices;
+            var scopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
+            using (var scope = scopeFactory.CreateScope())
+            using (var context = scope.ServiceProvider.GetRequiredService<GameDbContext>())
             {
-                scope.ServiceProvider.GetRequiredService<GameDbContext>().Database.Migrate();
+                context.Database.Migrate();
             }
         }
     }

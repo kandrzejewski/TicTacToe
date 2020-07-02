@@ -27,11 +27,8 @@ namespace TicTacToe.Services
             return Task.Run(() => _session.FirstOrDefault(x => x.Id == gameSessionId));
         }
 
-        public async Task<GameSessionModel> CreateGameSession(Guid invitationId, string invitedByEmail, string invitedPlayerEmail)
+        public async Task<GameSessionModel> CreateGameSession(Guid invitationId, UserModel invitedBy, UserModel invitedPlayer)
         {
-            var invitedBy = await _UserService.GetUserByEmail(invitedByEmail);
-            var invitedPlayer = await _UserService.GetUserByEmail(invitedPlayerEmail);
-
             GameSessionModel session = new GameSessionModel
             {
                 User1 = invitedBy,
@@ -44,7 +41,7 @@ namespace TicTacToe.Services
             return session;
         }
 
-        public async Task<GameSessionModel> AddTurn(Guid id, string email, int x, int y)
+        public async Task<GameSessionModel> AddTurn(Guid id, UserModel user, int x, int y)
         {
             List<TurnModel> turns;
             var gameSession = _session.FirstOrDefault(session => session.Id == id);
@@ -55,16 +52,16 @@ namespace TicTacToe.Services
 
             turns.Add(new TurnModel
             {
-                User = await _UserService.GetUserByEmail(email),
+                User = user,
                 X = x,
                 Y = y,
-                IconNumber = email == gameSession.User1?.Email ? "1" : "2"
+                IconNumber = user.Email == gameSession.User1?.Email ? "1" : "2"
             });
 
             gameSession.Turns = turns;
-            gameSession.TurnNumber += 1; 
+            gameSession.TurnNumber += 1;
 
-            if (gameSession.User1?.Email == email)
+            if (gameSession.User1?.Email == user.Email)
                 gameSession.ActiveUser = gameSession.User2;
             else
                 gameSession.ActiveUser = gameSession.User1;

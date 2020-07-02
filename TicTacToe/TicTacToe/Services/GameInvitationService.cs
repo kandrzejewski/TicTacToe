@@ -11,7 +11,7 @@ namespace TicTacToe.Services
     {
         private static ConcurrentBag<GameInvitationModel> _gameInvitations;
 
-        public GameInvitationService()
+        static GameInvitationService()
         {
             _gameInvitations = new ConcurrentBag<GameInvitationModel>();
         }
