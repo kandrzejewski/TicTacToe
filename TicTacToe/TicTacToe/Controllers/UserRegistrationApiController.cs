@@ -20,12 +20,12 @@ namespace TicTacToe.Controllers
         }
 
         [HttpDelete("{email}")]
-        public IActionResult DeleteUser(string email)
+        public async Task<IActionResult> DeleteUser(string email)
         {
-            var user = _userService.GetUserByEmail(email).Result;
+            var user = await _userService.GetUserByEmail(email);
             if (user == null)
                 return BadRequest();
-            _userService.DeleteUser(email);
+            await _userService.DeleteUser(user);
             return Ok();
         }
     }

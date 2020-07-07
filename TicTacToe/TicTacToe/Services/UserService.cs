@@ -140,13 +140,13 @@ namespace TicTacToe.Services
             await _userManager.UpdateAsync(userModel);
         }
 
-        public async Task DeleteUser(string email)
+        public async Task DeleteUser(UserModel userModel)
         {
             //using var db = new GameDbContext(_dbContextOptions);
             //var user = GetUserByEmail(email).Result;
             //db.Remove(user);
             //await db.SaveChangesAsync();
-            throw new NotImplementedException();
+            await _userManager.DeleteAsync(userModel);
         }
     }
 }

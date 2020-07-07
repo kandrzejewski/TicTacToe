@@ -78,5 +78,17 @@ namespace TicTacToe.Managers
             }
             return IdentityResult.Failed();
         }
+
+        public override async Task<IdentityResult> DeleteAsync(UserModel user)
+        {
+            using var dbContext = new GameDbContext(_dbContextOptions);
+            var current = await dbContext.Set<UserModel>().FirstOrDefaultAsync(x => x.Id == user.Id);
+            dbContext.Remove(current);
+            await dbContext.SaveChangesAsync();
+            if(await dbContext.Set<UserModel>().FirstOrDefaultAsync(x => x.Id == user.Id) == null)
+                return IdentityResult.Success;
+            else
+                return IdentityResult.Failed();
+        }
     }
 }
