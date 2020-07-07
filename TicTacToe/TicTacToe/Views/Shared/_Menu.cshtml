@@ -1,7 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Http;
 @{
-    var email = Context.Session.GetString("email");
-    var displayName = Context.Session.GetString("displayName");
+    var email = User?.Identity?.Name ?? Context.Session.GetString("email");
+    var displayName = User.Claims.FirstOrDefault(x=>x.Type == "displayName")?.Value ??
+        Context.Session.GetString("displayName");
 }
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -48,6 +49,12 @@
                         DisplayName = displayName
                     });
             }
-        </ul>
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Logowanie</a>
+                </li>
+            }
+            </ul>
     </div>
 </nav>

@@ -116,9 +116,19 @@ hr {
     min-width:350px;
 }
 
-ion-icon {
+ion-icon { 
+    font-size: 128px; 
+}
+
+#small > ion-icon {
+    font-size: 20px;
     color: #ffc107;
     --ionicon-stroke-width: 60px;
+}
+
+span > ion-icon {
+    color: #333333;
+    font-size: inherit;
 }
 
 
@@ -143,3 +153,83 @@ ion-icon {
     color: rgb(255, 255, 255);
     text-decoration: none;
 }
+
+html, body {
+    height: 100%;
+}
+
+.container {
+    /*height: 100%;*/
+    align-content: center;
+}
+
+.card {
+    height: 350px;
+    margin-top: 100px;
+    margin-bottom: 150px;
+    width: 400px;
+    background-color: rgba(0,0,0,0.5) !important;
+}
+
+.social_icon span {
+    font-size: 60px;
+    margin-left: 10px;
+    color: #FFC312;
+}
+
+    .social_icon span:hover {
+        color: white;
+        cursor: pointer;
+    }
+
+.card-header h3 {
+    color: white;
+}
+
+.social_icon {
+    position: absolute;
+    right: 20px;
+    top: -45px;
+}
+
+.input-group-prepend span {
+    width: 50px;
+    background-color: #FFC312;
+    color: black;
+    border: 0 !important;
+}
+
+input:focus {
+    outline: 0 0 0 0 !important;
+    box-shadow: 0 0 0 0 !important;
+}
+
+.remember {
+    color: white;
+}
+
+    .remember input {
+        width: 20px;
+        height: 20px;
+        margin-left: 15px;
+        margin-right: 5px;
+    }
+
+.login_btn {
+    color: black;
+    background-color: #FFC312;
+    width: 100px;
+}
+
+    .login_btn:hover {
+        color: black;
+        background-color: white;
+    }
+
+.links {
+    color: white;
+}
+
+    .links a {
+        margin-left: 4px;
+    }

@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Http
 @model TicTacToe.Models.GameSessionModel
-@{ 
+@{
     var email = Context.Session.GetString("email");
 }
 
@@ -11,11 +11,11 @@
         <table class="table">
             <tr>
                 <td>Użytkownik 1:</td>
-                <td>@Model.User1?.Email <ion-icon name="radio-button-off-sharp"></ion-icon></td>
+                <td>@Model.User1?.Email <span id="small"><ion-icon name="radio-button-off-sharp"></ion-icon></span></td>
             </tr>
             <tr>
                 <td>Użytkownik 2:</td>
-                <td>@Model.User2?.Email <ion-icon name="close-sharp"></ion-icon></td>
+                <td>@Model.User2?.Email <span id="small"><ion-icon name="close-sharp"></ion-icon></span></td>
             </tr>
         </table>
     </div>
@@ -23,13 +23,13 @@
 @section Mobile{
     <h1>Rozgrywka @Model.Id</h1>
     <h2>Rozpoczęta o @(DateTime.Now.ToShortTimeString())</h2>
-    Użytkownik 1: @Model.User1?.Email <ion-icon name="radio-button-off-sharp"></ion-icon>
-    Użytkownik 2: @Model.User2?.Email <ion-icon name="close-sharp"></ion-icon>
+    Użytkownik 1: @Model.User1?.Email <span id="small"><ion-icon name="radio-button-off-sharp"></ion-icon></span>
+    Użytkownik 2: @Model.User2?.Email <span id="small"><ion-icon name="close-sharp"></ion-icon></span>
 }
 <h3>E-mail użytkownika @email</h3>
 <h3>Aktywny użytkownik <span id="activeUser">@Model.ActiveUser?.Email</span></h3>
 <vc:game-session game-session-id="@Model.Id"></vc:game-session>
-@section Scripts{ 
+@section Scripts{
     <script>
         SetGameSession("@Model.Id", "@email");
         EnableCheckTurnIsFinished();

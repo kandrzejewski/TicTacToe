@@ -1,0 +1,47 @@
+﻿@model TicTacToe.Models.LoginModel
+
+@{
+    ViewData["Title"] = "Zaloguj się";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-center h-100">
+        <div class="card">
+            <div class="card-header">
+                <h3>Zaloguj się</h3>
+                @*<div class="d-flex justify-content-end social_icon">
+                        <span><i class="fab fa-facebook-square"></i></span>
+                        <span><i class="fab fa-google-plus-square"></i></span>
+                        <span><i class="fab fa-twitter-square"></i></span>
+                </div>*@
+            </div>
+            <div class="card-body">
+                <form role="form" asp-action="Login" asp-controller="Account">
+                    <input type="hidden" asp-for="ReturnUrl" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><ion-icon name="person-sharp"></ion-icon></span>
+                        </div>
+                        <input type="text" class="form-control" asp-for="UserName" value="" placeholder="nazwa użytkownika lub adres e-mail">
+                    </div>
+                    <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><ion-icon name="key-sharp"></ion-icon></span>
+                        </div>
+                        <input type="password" class="form-control" asp-for="Password" placeholder="hasło">
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Zaloguj się" class="btn float-right login_btn">
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-center links">
+                    Nie masz konta? Załóż je <a style="color:#FFC312;" asp-action="Index" asp-controller="UserRegistration"> tutaj</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -112,7 +112,7 @@ namespace TicTacToe.Controllers
                         return Ok("Gra zakończyła się remisem.");
                     }
 
-                    var userTurns = session.Turns.Where(x => x.User == session.User1).ToList();
+                    var userTurns = session.Turns.Where(x => x.User.Id == session.User1.Id).ToList();
                     var user1Won = CheckIfUserHasWon(session.User1?.Email, userTurns);
 
                     if (user1Won)
@@ -121,7 +121,7 @@ namespace TicTacToe.Controllers
                     }
                     else
                     {
-                        userTurns = session.Turns.Where(x => x.User == session.User2).ToList();
+                        userTurns = session.Turns.Where(x => x.User.Id == session.User2.Id).ToList();
                         var user2Won = CheckIfUserHasWon(session.User2?.Email, userTurns);
                         if (user2Won)
                         {

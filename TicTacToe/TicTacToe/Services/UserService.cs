@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -6,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TicTacToe.Data;
 using TicTacToe.Managers;
@@ -19,10 +23,11 @@ namespace TicTacToe.Services
         private ApplicationUserManager _userManager;
         private SignInManager<UserModel> _signInManager;
 
-        public UserService(ApplicationUserManager userManager, ILogger<UserService> logger)
+        public UserService(ApplicationUserManager userManager, ILogger<UserService> logger, SignInManager<UserModel> signInManager)
         {
             _userManager = userManager;
             _logger = logger;
+            _signInManager = signInManager;
 
             var emailTokenProvider = new EmailTokenProvider<UserModel>();
             _userManager.RegisterTokenProvider("Default", emailTokenProvider);
@@ -147,6 +152,63 @@ namespace TicTacToe.Services
             //db.Remove(user);
             //await db.SaveChangesAsync();
             await _userManager.DeleteAsync(userModel);
+        }
+
+        public async Task<SignInResult> SignInUser(LoginModel loginModel, HttpContext httpContext)
+        {
+            var start = DateTime.Now;
+            _logger.LogTrace($"logowanie użytkownika {loginModel.UserName}");
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            try
+            {
+                var user = await _userManager.FindByNameAsync(loginModel.UserName);
+                var isVaild = await _signInManager.CheckPasswordSignInAsync(user, loginModel.Password, true);
+                if (!isVaild.Succeeded)
+                {
+                    return SignInResult.Failed;
+                }
+
+                if (!await _userManager.IsEmailConfirmedAsync(user))
+                {
+                    return SignInResult.NotAllowed;
+                }
+
+                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                identity.AddClaim(new Claim(ClaimTypes.Name, loginModel.UserName));
+                identity.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName));
+                identity.AddClaim(new Claim(ClaimTypes.Surname, user.LastName));
+                identity.AddClaim(new Claim("displayName", $"{user.FirstName} {user.LastName}"));
+                if (!string.IsNullOrEmpty(user.PhoneNumber))
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.HomePhone, user.PhoneNumber));
+                }
+                identity.AddClaim(new Claim("Score", user.Score.ToString()));
+
+                await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(identity), new AuthenticationProperties { IsPersistent = false });
+
+                return isVaild;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"nie można zalogować użytkownika {loginModel.UserName} - {ex}");
+                throw ex;
+            }
+            finally
+            {
+                stopwatch.Stop();
+                _logger.LogTrace($"logowanie użytkownika {loginModel.UserName} ukończono w czasie {stopwatch.Elapsed}");
+            }
+        }
+
+        public async Task SingOutUser(HttpContext httpContext)
+        {
+            await _signInManager.SignOutAsync();
+            await httpContext.SignOutAsync(new AuthenticationProperties { IsPersistent = false });
+            return;
         }
     }
 }
