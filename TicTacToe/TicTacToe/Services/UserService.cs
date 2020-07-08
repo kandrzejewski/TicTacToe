@@ -210,5 +210,21 @@ namespace TicTacToe.Services
             await httpContext.SignOutAsync(new AuthenticationProperties { IsPersistent = false });
             return;
         }
+
+        public async Task<AuthenticationProperties> GetExternalAuthenticationProperties(string provider, string redirectUrl)
+        {
+            return await Task.FromResult(_signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl));
+        }
+
+        public async Task<ExternalLoginInfo> GetExternalLoginInfoAsync()
+        {
+            return await _signInManager.GetExternalLoginInfoAsync();
+        }
+
+        public async Task<SignInResult> ExternalLoginSignInAsync(string loginProvider, string providerKey, bool isPersistent)
+        {
+            _logger.LogInformation($"Logowanie użytkownika przez zewnętrzny serwis {loginProvider} - {providerKey}");
+            return await _signInManager.ExternalLoginSignInAsync(loginProvider, providerKey, isPersistent);
+        }
     }
 }

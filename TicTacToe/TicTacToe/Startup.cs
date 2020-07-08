@@ -83,7 +83,13 @@ namespace TicTacToe
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie();
+            }).AddCookie().AddFacebook(facebook =>
+            {
+                facebook.AppId = "993484707755228";
+                facebook.AppSecret = "b262580798efb6474971027ece3134b2";
+                //facebook.ClientId = "123";
+                //facebook.ClientSecret = "123";
+            });
 
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>(); 
         }

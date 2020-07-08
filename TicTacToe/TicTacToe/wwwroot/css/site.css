@@ -226,6 +226,16 @@ input:focus {
         background-color: white;
     }
 
+.login_facebook_btn {
+    color: black;
+    background-color: #3b5998;
+    width: 220px;
+}
+    .login_facebook_btn:hover {
+        color: black;
+        background-color: #8b9dc3;
+    }
+
 .links {
     color: white;
 }

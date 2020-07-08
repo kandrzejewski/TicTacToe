@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,7 +11,10 @@ namespace TicTacToe.Services
     {
         Task<bool> ConfirmEmail(string email, string code);
         Task DeleteUser(UserModel userModel);
+        Task<SignInResult> ExternalLoginSignInAsync(string loginProvider, string providerKey, bool isPersistent);
         Task<string> GetEmailConfirmationCode(UserModel user);
+        Task<AuthenticationProperties> GetExternalAuthenticationProperties(string provider, string redirectUrl);
+        Task<ExternalLoginInfo> GetExternalLoginInfoAsync();
         Task<IEnumerable<UserModel>> GetTopUsers(int numberOfUsers);
         Task<UserModel> GetUserByEmail(string email);
         Task<bool> IsUserExisting(string email);
