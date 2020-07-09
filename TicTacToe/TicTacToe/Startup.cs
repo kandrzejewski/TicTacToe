@@ -132,6 +132,8 @@ namespace TicTacToe
  
             app.UseRouting();
 
+            app.UseAuthorization();
+
             app.UseWebSockets();
 
             app.UseCommunicationMiddleware();
@@ -153,7 +155,7 @@ namespace TicTacToe
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "MyArea",
+                    name: "areaRoute",
                     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapControllerRoute(
                     name: "default",

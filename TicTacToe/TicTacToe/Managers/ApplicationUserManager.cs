@@ -90,5 +90,46 @@ namespace TicTacToe.Managers
             else
                 return IdentityResult.Failed();
         }
+
+        public override async Task<IdentityResult> SetTwoFactorEnabledAsync(UserModel user, bool enabled)
+        {
+            try
+            {
+                using var db = new GameDbContext(_dbContextOptions);
+                var current = await db.UserModels.FindAsync(user.Id);
+                current.TwoFactorEnabled = enabled;
+                await db.SaveChangesAsync();
+                return IdentityResult.Success;
+            }
+            catch(Exception ex)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = ex.ToString() });
+            }
+        }
+
+        public override async Task<string> GenerateTwoFactorTokenAsync(UserModel user, string tokenProvider)
+        {
+            using var dbContext = new GameDbContext(_dbContextOptions);
+            var emailTokenProvider = new EmailTokenProvider<UserModel>();
+            var token = await emailTokenProvider.GenerateAsync("TwoFactor", this, user);
+            dbContext.TwoFactorCodeModels.Add(new TwoFactorCodeModel
+            {
+                TokenCode = token,
+                TokenProvider = tokenProvider,
+                UserId = user.Id
+            });
+
+            if (dbContext.ChangeTracker.HasChanges())
+                await dbContext.SaveChangesAsync();
+
+            return token;
+        }
+
+        public override async Task<bool> VerifyTwoFactorTokenAsync(UserModel user, string tokenProvider, string token)
+        {
+            using var dbContext = new GameDbContext(_dbContextOptions);
+            return await dbContext.TwoFactorCodeModels.AnyAsync(x => x.TokenProvider == tokenProvider &&
+                x.TokenCode == token && x.UserId == user.Id);
+        }
     }
 }

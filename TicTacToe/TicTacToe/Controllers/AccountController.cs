@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.DependencyInjection;
 using TicTacToe.Models;
 using TicTacToe.Services;
 
@@ -40,9 +42,14 @@ namespace TicTacToe.Controllers
                     else
                         return RedirectToAction("Index", "Home");
                 }
+                else if (result.RequiresTwoFactor)
+                {
+                    await SendEmailTwoFactor(loginModel.UserName);
+                    return RedirectToAction("ValidateTwoFactor");
+                }
                 else
                     ModelState.AddModelError("", result.IsLockedOut ? 
-                        "Użytkownik jest zablokowany" : "Użytkownik nie ma prawa dostępu");
+                        "Użytkownik jest zablokowany" : "Użytkownik nie jest upoważniony");
             }
             return View();
         }
@@ -95,6 +102,56 @@ namespace TicTacToe.Controllers
             {
                 return View("NotFound");
             }
+        }
+
+        private async Task SendEmailTwoFactor(string UserName)
+        {
+            var user = await _userService.GetUserByEmail(UserName);
+            var urlAction = new UrlActionContext
+            {
+                Action = "ValidateTwoFactor",
+                Controller = "Account",
+                Values = new { email = UserName, code = await _userService.GetTwoFactorCode(user.UserName, "Email") },
+                Protocol = Request.Scheme,
+                Host = Request.Host.ToString()
+            };
+
+            var TwoFactorEmailModel = new TwoFactorEmailModel
+            {
+                DisplayName = $"{user.FirstName} {user.LastName}",
+                Email = UserName,
+                ActionUrl = Url.Action(urlAction)
+            };
+            var emailRenderService = HttpContext.RequestServices.GetService<IEmailTemplateRenderService>();
+            var emailService = HttpContext.RequestServices.GetService<IEmailService>();
+            var message = await emailRenderService.RenderTemplate("EmailTemplates/TwoFactorEmail", TwoFactorEmailModel, Request.Host.ToString());
+            try
+            {
+                emailService.SendEmail(UserName, "Kod zabezpieczający aplikacji Kółko i Krzyżyk", message).Wait();
+            }
+            catch
+            {
+            }
+        }
+
+        public async Task<IActionResult> ValidateTwoFactor(string email, string code)
+        {
+            return await Task.Run(() =>
+            {
+                return View(new ValidateTwoFactorModel { UserName = email, Code = code });
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ValidateTwoFactor(ValidateTwoFactorModel validateTwoFactorModel)
+        {
+            if (ModelState.IsValid)
+            {
+                await _userService.ValidateTwoFactor(validateTwoFactorModel.UserName, "Email", validateTwoFactorModel.Code, HttpContext);
+                return RedirectToAction("Index", "Home");
+            }
+
+            return View();
         }
     }
 }

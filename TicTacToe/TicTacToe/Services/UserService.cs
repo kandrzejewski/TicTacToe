@@ -176,6 +176,11 @@ namespace TicTacToe.Services
                     return SignInResult.NotAllowed;
                 }
 
+                if (await _userManager.GetTwoFactorEnabledAsync(user))
+                {
+                    return SignInResult.TwoFactorRequired;
+                }
+
                 var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
                 identity.AddClaim(new Claim(ClaimTypes.Name, loginModel.UserName));
                 identity.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName));
@@ -225,6 +230,52 @@ namespace TicTacToe.Services
         {
             _logger.LogInformation($"Logowanie użytkownika przez zewnętrzny serwis {loginProvider} - {providerKey}");
             return await _signInManager.ExternalLoginSignInAsync(loginProvider, providerKey, isPersistent);
+        }
+
+        public async Task<IdentityResult> EnableTwoFactor(string name, bool enabled)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(name);
+                user.TwoFactorEnabled = true;
+                await _userManager.SetTwoFactorEnabledAsync(user, enabled);
+                return IdentityResult.Success;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<string> GetTwoFactorCode(string userName, string tokenProvider)
+        {
+            var user = await GetUserByEmail(userName);
+            return await _userManager.GenerateTwoFactorTokenAsync(user, tokenProvider);
+        }
+
+        public async Task<bool> ValidateTwoFactor(string userName, string tokenProvider, string token, HttpContext httpContext)
+        {
+            var user = await GetUserByEmail(userName);
+            if (await _userManager.VerifyTwoFactorTokenAsync(user, tokenProvider, token))
+            {
+                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
+                identity.AddClaim(new Claim(ClaimTypes.GivenName, user.FirstName));
+                identity.AddClaim(new Claim(ClaimTypes.Surname, user.LastName));
+                identity.AddClaim(new Claim("displayName", $"{user.FirstName} {user.LastName}"));
+
+                if (!string.IsNullOrEmpty(user.PhoneNumber))
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.HomePhone, user.PhoneNumber));
+                }
+
+                identity.AddClaim(new Claim("Score", user.Score.ToString()));
+                await httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(identity), new AuthenticationProperties { IsPersistent = false });
+
+                return true;
+            }
+            return false;
         }
     }
 }

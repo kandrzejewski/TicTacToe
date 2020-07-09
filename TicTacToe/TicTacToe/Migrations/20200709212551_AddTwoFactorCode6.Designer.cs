@@ -10,8 +10,8 @@ using TicTacToe.Data;
 namespace TicTacToe.Migrations
 {
     [DbContext(typeof(GameDbContext))]
-    [Migration("20200702224949_IdentityDb")]
-    partial class IdentityDb
+    [Migration("20200709212551_AddTwoFactorCode6")]
+    partial class AddTwoFactorCode6
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,38 @@ namespace TicTacToe.Migrations
                 .HasAnnotation("ProductVersion", "3.1.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.ToTable("UserRoleModel");
+                });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("LoginProvider")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId", "LoginProvider", "Name");
+
+                    b.ToTable("IdentityUserToken<Guid>");
+                });
 
             modelBuilder.Entity("TicTacToe.Models.GameInvitationModel", b =>
                 {
@@ -140,6 +172,29 @@ namespace TicTacToe.Migrations
                     b.ToTable("TurnModel");
                 });
 
+            modelBuilder.Entity("TicTacToe.Models.TwoFactorCodeModel", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("TokenCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TokenProvider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TwoFactorCodeModel");
+                });
+
             modelBuilder.Entity("TicTacToe.Models.UserModel", b =>
                 {
                     b.Property<Guid>("Id")
@@ -224,7 +279,8 @@ namespace TicTacToe.Migrations
                 {
                     b.HasOne("TicTacToe.Models.UserModel", "User2")
                         .WithMany()
-                        .HasForeignKey("User2Id");
+                        .HasForeignKey("User2Id")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("TicTacToe.Models.UserModel", "User1")
                         .WithMany()
@@ -245,6 +301,15 @@ namespace TicTacToe.Migrations
                         .WithMany("Turns")
                         .HasForeignKey("GameSessionModelId");
 
+                    b.HasOne("TicTacToe.Models.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TicTacToe.Models.TwoFactorCodeModel", b =>
+                {
                     b.HasOne("TicTacToe.Models.UserModel", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
