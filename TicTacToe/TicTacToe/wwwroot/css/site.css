@@ -171,6 +171,10 @@ html, body {
     background-color: rgba(0,0,0,0.5) !important;
 }
 
+.card-smaller {
+    height: 260px;
+}
+
 .social_icon span {
     font-size: 60px;
     margin-left: 10px;
@@ -184,6 +188,10 @@ html, body {
 
 .card-header h3 {
     color: white;
+}
+
+.card-header p {
+    color: #FFC312;
 }
 
 .social_icon {

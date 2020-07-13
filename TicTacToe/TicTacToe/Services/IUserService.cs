@@ -16,11 +16,13 @@ namespace TicTacToe.Services
         Task<string> GetEmailConfirmationCode(UserModel user);
         Task<AuthenticationProperties> GetExternalAuthenticationProperties(string provider, string redirectUrl);
         Task<ExternalLoginInfo> GetExternalLoginInfoAsync();
+        Task<string> GetResetPasswordCode(UserModel user);
         Task<IEnumerable<UserModel>> GetTopUsers(int numberOfUsers);
         Task<string> GetTwoFactorCode(string userName, string tokenProvider);
         Task<UserModel> GetUserByEmail(string email);
         Task<bool> IsUserExisting(string email);
         Task<bool> RegisterUser(UserModel userModel);
+        Task<IdentityResult> ResetPassword(string userName, string password, string token);
         Task<SignInResult> SignInUser(LoginModel loginModel, HttpContext httpContext);
         Task SingOutUser(HttpContext httpContext);
         Task UpdateUser(UserModel userModel);

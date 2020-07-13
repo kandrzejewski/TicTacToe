@@ -153,5 +153,79 @@ namespace TicTacToe.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ForgotPassword()
+        {
+            return await Task.Run(() =>
+            {
+                return View();
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendResetPassword(string UserName)
+        {
+            var user = await _userService.GetUserByEmail(UserName);
+            var urlAction = new UrlActionContext
+            {
+                Action = "ResetPassword",
+                Controller = "Account",
+                Values = new
+                {
+                    email = UserName,
+                    code = await _userService.GetResetPasswordCode(user)
+                },
+                Protocol = Request.Scheme,
+                Host = Request.Host.ToString()
+            };
+
+            var resetPasswordEmailModel = new ResetPasswordEmailModel
+            {
+                DisplayName = $"{user.FirstName} {user.LastName}",
+                Email = UserName,
+                ActionUrl = Url.Action(urlAction)
+            };
+
+            var emailRenderService = HttpContext.RequestServices.GetService<IEmailTemplateRenderService>();
+            var emailService = HttpContext.RequestServices.GetService<IEmailService>();
+            var message = await emailRenderService.RenderTemplate("EmailTemplates/ResetPasswordEmail", resetPasswordEmailModel, Request.Host.ToString());
+
+            try
+            {
+                emailService.SendEmail(UserName, "resetowanie hasła w aplikacji Kółko i krzyżyk", message).Wait();
+            }
+            catch
+            {
+
+            }
+
+            return View("ConfirmResetPasswordRequest", resetPasswordEmailModel);
+        }
+
+        public async Task<IActionResult> ResetPassword(string email, string code)
+        {
+            var user = await _userService.GetUserByEmail(email);
+            ViewBag.Code = code;
+            return View(new ResetPasswordModel
+            {
+                Token = code,
+                UserName = email
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel reset)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _userService.ResetPassword(reset.UserName, reset.Password, reset.Token);
+                if (result.Succeeded)
+                    return RedirectToAction("Login");
+                else
+                    ModelState.AddModelError("", "Nie można zresetować Twojego hasła");
+            }
+            return View();
+        }
     }
 }

@@ -277,5 +277,36 @@ namespace TicTacToe.Services
             }
             return false;
         }
+
+        public async Task<string> GetResetPasswordCode(UserModel user)
+        {
+            return await _userManager.GeneratePasswordResetTokenAsync(user);
+        }
+
+        public async Task<IdentityResult> ResetPassword(string userName, string password, string token)
+        {
+            var start = DateTime.Now;
+            _logger.LogTrace($"Resetowanie hasłoa użytkownika {userName}");
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            try
+            {
+                var user = await _userManager.FindByNameAsync(userName);
+                var result = await _userManager.ResetPasswordAsync(user, token, password);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Nie można zresetować hasła użytkownika {userName} - {ex}");
+                throw ex;
+            }
+            finally
+            {
+                stopwatch.Stop();
+                _logger.LogTrace($"Resetowanie hasła użytkownika {userName} ukończono w ciągu {stopwatch.Elapsed}");
+            }
+        }
     }
 }
